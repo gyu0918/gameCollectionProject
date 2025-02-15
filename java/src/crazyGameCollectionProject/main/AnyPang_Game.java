@@ -36,6 +36,7 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
 
             if(trueflag== 1) {
                 gameStart();
+                updateScore(trueflag);
             }else if (trueflag == 7) {
                 break;
             }
@@ -52,9 +53,12 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
         }
     }
 
-    public static void gameStart() {
+    public static void gameStart() throws IOException{
          boolean gameFFlag = true;
-          while(true){
+         //total 배열 해당게임 점수 초기화
+        totalScore[0] = 0;
+
+         while(true){
 
             if(!gameStartFlag ) {
                 fillBoard();

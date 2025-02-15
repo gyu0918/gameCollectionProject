@@ -1,5 +1,8 @@
 package crazyGameCollectionProject.main;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
 import java.io.*;
+import java.nio.Buffer;
 import java.util.*;
 
 public class db {
@@ -36,10 +39,7 @@ public class db {
                 if (login())
                     continue;
             }
-            //menuNum 1번 : 게임스타트 2번 : 코인개수  3번 :  아이템개수 4번 : 랭킹시스템
-            if (openMenu() == 0)
-                continue ;
-
+            openMenu();
         }
     }
 
@@ -214,7 +214,49 @@ public class db {
             break ;
         }
     }
+    public static void updateScore(int gameNum) throws IOException{
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = new BufferedReader(new FileReader(file));
 
+        //멤버 변수에 있는 total[] 게임의 점수를 보고 갱신해야될지 안해야될지 판단!
+
+        //갱신해야된다면 br bw 이용해서 갱신!
+        //gameNum 1 : 애니팡 2: 오목
+        //텍스트 파일에 0아이디,1비밀번호,2애니팡점수,3오목점수,4추가게임점수,5코인개수,6폭탄아이템개수,7십자가아이템개수,8선택숫자삭제아이템개수
+        String str;
+        while ((str = br.readLine()) != null) {
+            String[] part = str.split(",");
+            if (part[0].equals(loginId)) {
+
+                // 아이템 개수 수정
+                int score = Integer.parseInt(part[gameNum + 1]);
+                //아이템 개수 체크해서 사용못하도록
+                if (AnyPang_Game.totalScore[gameNum - 1] <= score){
+                    br.close();
+                    return  ;
+                }
+                part[gameNum + 1] = String.valueOf(AnyPang_Game.totalScore[gameNum - 1]);
+                System.out.println(part[gameNum + 1]);
+                sb.append(loginId).append(",")
+                        .append(part[1]).append(",")
+                        .append(part[2]).append(",")
+                        .append(part[3]).append(",")
+                        .append(part[4]).append(",")
+                        .append(part[5]).append(",")
+                        .append(part[6]).append(",")
+                        .append(part[7]).append(",")
+                        .append(part[8]).append("\n");
+            } else {  //해당 로그인아이디가 아닐경우 이렇게 한줄을 읽어봐 그대로 sb에 넣어준다.
+                sb.append(str).append("\n");
+            }
+        }
+
+        br.close();
+        // 수정된 내용을 파일에 덮어쓰기
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        bw.write(sb.toString());
+        bw.close();
+    }
     public static void defindRanking(int rankingNum) throws IOException{
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -271,6 +313,8 @@ public class db {
             return 1;
         }else if (menuNum == 2){
             Five_In_A_Row_Game.omogGame();
+            //이부분은 점수 오목게임 로그인 방식 바꾸고 나서 들어가야될듯 위치가 여기가 아닐수도 있음
+            updateScore(menuNum);
         }else if (menuNum == 3){
             ptrCoin();
         }else if (menuNum == 4){
@@ -284,9 +328,59 @@ public class db {
         }
         return 0;
     }
-    public static void item(int choiceItem){
-        // 회원별 아이템이 얼마나 남아있는지 에 따라서 밑에 아이템 기능들이 작동하도록 해야한다.
+    public static boolean updateItem(int choiceItem) throws IOException{
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = new BufferedReader(new FileReader(file));
 
+        //choiceItem 1 2 3 만 들어옴
+        //텍스트 파일에 0아이디,1비밀번호,2뿌요점수,3오목점수,4추가게임점수,5코인개수,6폭탄아이템개수,7십자가아이템개수,8선택숫자삭제아이템개수
+        String str;
+        while ((str = br.readLine()) != null) {
+            String[] part = str.split(",");
+            if (part[0].equals(loginId)) {
+                // 아이템 개수 수정
+                int itemCnt = Integer.parseInt(part[choiceItem + 5]);
+                //아이템 개수 체크해서 사용못하도록
+                if (itemCnt == 0){
+                    br.close();
+                    return true ;
+                }
+                itemCnt -= 1;
+                part[choiceItem + 5] = String.valueOf(itemCnt);
+                sb.append(loginId).append(",")
+                        .append(part[1]).append(",")
+                        .append(part[2]).append(",")
+                        .append(part[3]).append(",")
+                        .append(part[4]).append(",")
+                        .append(part[5]).append(",")
+                        .append(part[6]).append(",")
+                        .append(part[7]).append(",")
+                        .append(part[8]).append("\n");
+
+            } else {  //이 부분이 없다면 새로 변경되고 나머지 아이디는 모두 지워진다.
+                sb.append(str).append("\n");
+            }
+        }
+
+        br.close();
+        // 수정된 내용을 파일에 덮어쓰기
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        bw.write(sb.toString());
+        bw.close();
+        return false;
+    }
+    public static void item(int choiceItem) throws IOException {
+        // 회원별 아이템이 얼마나 남아있는지 에 따라서 밑에 아이템 기능들이 작동하도록 해야한다.
+        while(true){
+            if (updateItem(choiceItem)){
+                System.out.println("해당 아이템은 사용할수 있는 개수가 없습니다. 아이템 숫자를 다시 적어주세요 아이템을 사용하기 싫다면 999을 적으세요");
+                choiceItem = in.nextInt();
+                if (choiceItem == 999)
+                    return ;
+            }else{
+                break ;
+            }
+        }
         // 폭탄 : 해당범위 숫자 0으로 제거 (랜덤범위로)
         if (choiceItem == 1){
             //예외 처리
