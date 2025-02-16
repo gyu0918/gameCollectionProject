@@ -35,7 +35,7 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             //menuNum 1번 : 게임스타트 2번 : 코인개수  3번 :  아이템개수 4번 : 랭킹시스템
             int trueflag = openMenu();
             if(trueflag== 1) {
-//                threadGO();
+                threadGO();
                 gameStart();
                 updateScore(trueflag, loginId, false);
             }else if (trueflag == 7) {
@@ -55,10 +55,10 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
     }
 
     public static void gameStart() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
          boolean gameFFlag = true;
          totalScore[0] = 0;
-
+         isTimeout = false;
+         gameStartFlag = false;
           while(!isTimeout){
 
             if(!gameStartFlag ) {
@@ -70,13 +70,18 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             copyArray(1);
             System.out.println("아이템 사용하겠습니까? yes or no");
 
-            String input = in.nextLine().trim();
+//            String input = in.nextLine().trim();
+            String input = inputProcessString();
+            if (input == null)
+                break ;
             if (input.equals("yes")) {
                 System.out.println("아이템 목록 : (1)"+"💣"+ "폭탄 "+"(2)"+"✝️"+"십자가 (3)"+"❤️" +"일심동체 ");
-                int gameItemnum = in.nextInt();
-
-                item(gameItemnum);
-                in.nextLine(); //버퍼 지우기
+                int gameItemnum = inputProcessInt();
+                if (gameItemnum == 1004)
+                    break ;
+                if (item(gameItemnum) == 1004)
+                    break ;
+//                in.nextLine(); //버퍼 지우기
                 prtTool();
 
                 downZero();
@@ -89,7 +94,8 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
 
             }
 
-            changeCoordintae();  //좌표 바꾸기
+            if (changeCoordintae() == 1004)  //좌표 바꾸기
+                break ;
             checkDuplicate();
             downZero();
             fillZero();
@@ -105,6 +111,35 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
 
 
     //------------------------------------------------------------------------------------------
+    public static String inputProcessString(){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String input = null;
+        while (!isTimeout) {
+            try {
+                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
+                    input = reader.readLine();
+                    break;
+                }
+            } catch (IOException ignored) {}
+        }
+        System.out.println(input);
+        return input;
+    }
+    public static int inputProcessInt(){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        int result = 1004;
+        while (!isTimeout) {
+            try {
+                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
+                    result = Integer.parseInt(reader.readLine());
+                    break;
+                }
+            } catch (IOException ignored) {}
+        }
+        return result;
+    }
+
     public static void resetTotalScore(){
 
     }
@@ -235,36 +270,34 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
 
     public static int endGame() {
         System.out.println("종료(0) / 계속(1)");
-        int choice = in.nextInt();
-        in.nextLine(); //버퍼 지우기!!!!
-//        int cnt = 0;
-//        for (int i = 0; i < second.length; i++) {          //게임 탈락여부
-//            for (int j = 0; j < second[0].length; j++) {
-//                if (second[i][j] == 0) {
-//                    cnt++;
-//                }
-//            }
-//        }
-
+        int choice = inputProcessInt();
+        if (choice == 1004)
+            return 1;
         if (choice == 0) {               //게임수동 종료
             return 1;
         }
         return 0;
     }
-    public static void changeCoordintae() {
+    public static int changeCoordintae() {
         System.out.println();
         System.out.println("좌표를 변경하시겠습니까? 예(0) 아니오(1)");
-        int choice = in.nextInt();
+        int choice = AnyPang_Game.inputProcessInt();
+        if (choice == 1004)
+            return 1004;
         int temp = 0;
         if(choice == 0){
 
             System.out.println("변경할 좌표를 입력하세요");
-            String coordinate = in.next();
+            String coordinate = inputProcessString();
+            if (coordinate == null)
+                return 1004;
             String[] x_and_Y = coordinate.split(",");
             int x1 = Integer.parseInt(x_and_Y[0]);
             int y1 = Integer.parseInt(x_and_Y[1]);
             System.out.println("이동할 좌표를 입력하세요");
-            String moveCoordinate = in.next();
+            String moveCoordinate = inputProcessString();
+            if (moveCoordinate == null)
+                return 1004;
             String[] changeX_and_Y = moveCoordinate.split(",");
             int x2 = Integer.parseInt(changeX_and_Y[0]);
             int y2 = Integer.parseInt(changeX_and_Y[1]);
@@ -273,6 +306,7 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             second[x2][y2] = temp;
 
         }
+        return 0;
     }
     public static void endGameCnt(){
         for(int i = 0 ; i < second.length ; i++){

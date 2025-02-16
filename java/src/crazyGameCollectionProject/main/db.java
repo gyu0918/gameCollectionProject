@@ -53,7 +53,7 @@ public class db {
         Thread timerThread = new Thread(new Runnable() {
             public void run() {
                 try {
-                    Thread.sleep(40000); // 10초 대기
+                    Thread.sleep(10000); // 10초 대기
                     isTimeout = true; // 타임아웃 설정
                 } catch (InterruptedException ignored) {}
             }
@@ -411,20 +411,26 @@ public class db {
         bw.close();
         return false;
     }
-    public static void item(int choiceItem) throws IOException {
+    public static int item(int choiceItem) throws IOException {
+
+        int temp = choiceItem;
         // 회원별 아이템이 얼마나 남아있는지 에 따라서 밑에 아이템 기능들이 작동하도록 해야한다.
         while(true){
             if (updateItem(choiceItem)){
                 System.out.println("해당 아이템은 사용할수 있는 개수가 없습니다. 아이템 숫자를 다시 적어주세요 아이템을 사용하기 싫다면 999을 적으세요");
-                choiceItem = in.nextInt();
+                choiceItem = AnyPang_Game.inputProcessInt();
+                if (choiceItem == 1004)
+                    return 1004;
+                System.out.println(choiceItem + "------------------------");
                 if (choiceItem == 999)
-                    return ;
+                    return 0;
+
             }else{
                 break ;
             }
         }
         // 폭탄 : 해당범위 숫자 0으로 제거 (랜덤범위로)
-        if (choiceItem == 1){
+        if (temp == 1){
             //예외 처리
 
             int col = rand.nextInt(7);
@@ -439,7 +445,7 @@ public class db {
                 }
             }
             // 지맘대로 십자가 : 가로 세로 한줄 전체를 랜덤한 위치에 모두 0으로 만들어준다.
-        }else if (choiceItem == 2){
+        }else if (temp == 2){
             int col = rand.nextInt(7);
             int row = rand.nextInt(7);
             for (int i = 0; i < parentSecond.length; i++) {
@@ -450,7 +456,7 @@ public class db {
                 }
             }
             // 일심동체 :선택한 숫자만 모두 없애는 기능
-        }else if (choiceItem == 3){
+        }else if (temp == 3){
             System.out.println("삭제하고 싶은 캐릭터를 고르세요");
             System.out.println("(1)"+"🐸"+" (2)"+"🐶"+" (3)"+"🦄"+" (4)"+"🦁"+" (5)"+"🐯"+" (6)"+"🐰"+" (7)"+"🐍"+" (8)"+"🐗"+" (9)"+"🐛"+" (10)"+"🍄"+" (11)"+"🔥");
             int deleteNum = in.nextInt();
@@ -464,6 +470,7 @@ public class db {
                 }
             }
         }
+        return 0;
     }
 
 }
