@@ -1,6 +1,8 @@
 package crazyGameCollectionProject.main;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 
@@ -22,10 +24,9 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
 
     public static void main(String[] args) throws IOException{
 
-
         while (true) {
             if (openMenuflag) {
-                if (login()) {
+                if (login(false)) {
                     openMenuflag = false;
                     continue;
                 }
@@ -33,10 +34,10 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             }
             //menuNum 1번 : 게임스타트 2번 : 코인개수  3번 :  아이템개수 4번 : 랭킹시스템
             int trueflag = openMenu();
-
             if(trueflag== 1) {
+//                threadGO();
                 gameStart();
-                updateScore(trueflag);
+                updateScore(trueflag, loginId, false);
             }else if (trueflag == 7) {
                 break;
             }
@@ -53,12 +54,12 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
         }
     }
 
-    public static void gameStart() throws IOException{
+    public static void gameStart() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
          boolean gameFFlag = true;
-         //total 배열 해당게임 점수 초기화
-        totalScore[0] = 0;
+         totalScore[0] = 0;
 
-         while(true){
+          while(!isTimeout){
 
             if(!gameStartFlag ) {
                 fillBoard();
@@ -69,7 +70,7 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             copyArray(1);
             System.out.println("아이템 사용하겠습니까? yes or no");
 
-                String input = in.nextLine().trim();
+            String input = in.nextLine().trim();
             if (input.equals("yes")) {
                 System.out.println("아이템 목록 : (1)"+"💣"+ "폭탄 "+"(2)"+"✝️"+"십자가 (3)"+"❤️" +"일심동체 ");
                 int gameItemnum = in.nextInt();
@@ -94,7 +95,6 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             fillZero();
             prtTool();
             copyArray(2);
-
 
             if (endGame() == 1) {
                     break;

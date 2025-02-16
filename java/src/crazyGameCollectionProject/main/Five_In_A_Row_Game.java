@@ -3,7 +3,7 @@ package crazyGameCollectionProject.main;
 import java.io.IOException;
 import java.util.*;
 
-public class Five_In_A_Row_Game extends db{
+public class Five_In_A_Row_Game extends db {
     static Scanner sc = new Scanner(System.in);
     static int size = 16;
     static String[][]board = new String[size][size];
@@ -14,14 +14,19 @@ public class Five_In_A_Row_Game extends db{
     static int x = 0;
     static int y = 0;
     static boolean realFlag = true;
-    static String player1 = "";
-    static String player2 = "";
+    static String player1;
+    static String player2;
     public static void omogGame() throws IOException {
         boardspace();
-        inputId();
+//        inputId();
+        login(true);
+        printBoard();
+       //점수 초기화
+        AnyPang_Game.totalScore[1] = 0;
+        realFlag = true;
        while(realFlag){
 
-           printBoard();
+//
            inputPlayer();
            printBoard();
            checkWinner();
@@ -86,7 +91,7 @@ public class Five_In_A_Row_Game extends db{
     }
 
     public static void printBoard() {
-        System.out.println("\n\033[93m     0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15  "+reset);
+        System.out.println("\n\033[93m     0    1    2    3    4    5     6    7    8    9    10   11   12   13   14   15  "+reset);
         System.out.println("  ----------------------------------------------------------------------------------");
 
         for (int i = 0; i < size  ; i++) {
@@ -102,7 +107,7 @@ public class Five_In_A_Row_Game extends db{
             System.out.println("  ----------------------------------------------------------------------------------");
         }
     }
-    public static void checkWinner(){
+    public static void checkWinner() throws IOException{
 
         int rowRightCnt = 1;
         int rowLeftCnt = 1;
@@ -163,16 +168,19 @@ public class Five_In_A_Row_Game extends db{
             }
             System.out.println("\n" + border);
             System.out.println("\033[1;33m" + "          🏆 축하합니다! 🏆          " + "\033[0m");
-           if(nowPlayer.equals(lightRed + "X"+reset)) {
+           if(nowPlayer.equals(lightRed + "X" + reset)) {
                System.out.println("\033[1;32m" + "       🎉 승자는: " +player1+ nowPlayer + " 🎉" + "\033[0m");
+               AnyPang_Game.totalScore[1] += 4;
+               updateScore(2,player1,true);
            }else{
                System.out.println("\033[1;32m" + "       🎉 승자는: " +player2+ nowPlayer + " 🎉" + "\033[0m");
+               AnyPang_Game.totalScore[1] += 4;
+               updateScore(2,player2,true);
            }
+
            System.out.println("\033[1;34m" + "        게임이 종료되었습니다!        " + "\033[0m");
-            System.out.println(border);
+           System.out.println(border);
             realFlag = false; // 게임 종료
         }
     }
-
-
 }

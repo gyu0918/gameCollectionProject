@@ -1,8 +1,7 @@
 package crazyGameCollectionProject.main;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
 
 import java.io.*;
-import java.nio.Buffer;
 import java.util.*;
 
 public class db {
@@ -22,6 +21,8 @@ public class db {
     static int[][] itemInfo = new int[10][4];
     //로그인되어있는 id를 멤버 변수로
     static String loginId;
+    //오목게임이나 체스 게임 같이 둘이서 같이 하는거떄문에 멤버 변수 선언
+    static String gameId2;
 
     //아이템별 구매할떄 필요한 코인 개수
     static int[] numberOfCoins = {3,4,5};
@@ -30,17 +31,35 @@ public class db {
     static int flag = 0;
     static int index = 0;  //로그인시 필요한 정보 인덱스 접근을 위해 선언
     static boolean openMenuflag = true;
+
+    static boolean isTimeout  = false;
+
     public static void main(String[] args) throws IOException {
         int menuNum = 0;
 
         while (!stop) {
             if (openMenuflag) {
                 openMenuflag = false;
-                if (login())
+                if (login(false))
                     continue;
             }
             openMenu();
         }
+    }
+
+
+    //쓰레드 부분
+    public static void threadGO(){
+        Thread timerThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(40000); // 10초 대기
+                    isTimeout = true; // 타임아웃 설정
+                } catch (InterruptedException ignored) {}
+            }
+        });
+        System.out.println("제한시간은 40초 입니다. 화이팅!!!!!!!!!!");
+        timerThread.start();
     }
 
     //txt파일에서 회원 아이디 찾는 메서드
@@ -65,7 +84,7 @@ public class db {
         br.close();
         return true;
     }
-    public static boolean login() throws IOException {
+    public static boolean login(boolean opponentIdCheck) throws IOException {
         //파일 존재 여부 체크 및 생성
         if (!file.exists()){
             file.createNewFile();
@@ -75,10 +94,28 @@ public class db {
 
         int cntPwd = 0;
         //로그인 부터
-        System.out.println("아이디를 입력하세요.");
-        String name = in.nextLine();
         //id를 멤버 변수로
-        loginId = name;
+        String name;
+        if (opponentIdCheck) {
+            while(true){
+                System.out.println("상대방 아이디를 입력하세요.");
+                name = in.nextLine();
+                if (name.equals(loginId)) {
+                    System.out.println(" 로그인된 아이디와 같은 아이디 입니다.");
+                    continue;
+                }
+                gameId2 = name;
+                Five_In_A_Row_Game.player2 = gameId2;
+                break ;
+            }
+
+
+        }else{
+            System.out.println("아이디를 입력하세요.");
+            name = in.nextLine();
+            loginId = name;
+            Five_In_A_Row_Game.player1 = loginId;
+        }
 
         //텍스트 파일에 아이디,비밀번호,뿌요점수,오목점수,추가게임점수,코인개수,폭탄아이템개수,십자가아이템개수,선택숫자삭제아이템개수
         //id 검색 + 회원가입부분
@@ -214,7 +251,7 @@ public class db {
             break ;
         }
     }
-    public static void updateScore(int gameNum) throws IOException{
+    public static void updateScore(int gameNum, String updateId, boolean oppenentCheck) throws IOException{
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -226,18 +263,23 @@ public class db {
         String str;
         while ((str = br.readLine()) != null) {
             String[] part = str.split(",");
-            if (part[0].equals(loginId)) {
+            if (part[0].equals(updateId)) {
 
                 // 아이템 개수 수정
                 int score = Integer.parseInt(part[gameNum + 1]);
                 //아이템 개수 체크해서 사용못하도록
-                if (AnyPang_Game.totalScore[gameNum - 1] <= score){
-                    br.close();
-                    return  ;
+                if (oppenentCheck){
+                    AnyPang_Game.totalScore[gameNum - 1] += score;
+                }else{
+                    if (AnyPang_Game.totalScore[gameNum - 1] <= score){
+                        br.close();
+                        return  ;
+                    }
                 }
+
                 part[gameNum + 1] = String.valueOf(AnyPang_Game.totalScore[gameNum - 1]);
                 System.out.println(part[gameNum + 1]);
-                sb.append(loginId).append(",")
+                sb.append(updateId).append(",")
                         .append(part[1]).append(",")
                         .append(part[2]).append(",")
                         .append(part[3]).append(",")
@@ -312,9 +354,9 @@ public class db {
         if (menuNum == 1){
             return 1;
         }else if (menuNum == 2){
+            in.nextLine();
             Five_In_A_Row_Game.omogGame();
             //이부분은 점수 오목게임 로그인 방식 바꾸고 나서 들어가야될듯 위치가 여기가 아닐수도 있음
-            updateScore(menuNum);
         }else if (menuNum == 3){
             ptrCoin();
         }else if (menuNum == 4){
