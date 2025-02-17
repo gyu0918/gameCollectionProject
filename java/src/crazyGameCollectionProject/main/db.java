@@ -32,29 +32,26 @@ public class db {
     static int index = 0;  //로그인시 필요한 정보 인덱스 접근을 위해 선언
     static boolean openMenuflag = true;
 
+    //Thread 부분
     static boolean isTimeout  = false;
-
-    public static void main(String[] args) throws IOException {
-        int menuNum = 0;
-
-        while (!stop) {
-            if (openMenuflag) {
-                openMenuflag = false;
-                if (login(false))
-                    continue;
-            }
-            openMenu();
-        }
-    }
+    static boolean threadOut = false;
 
 
     //쓰레드 부분
     public static void threadGO(){
         Thread timerThread = new Thread(new Runnable() {
             public void run() {
+                threadOut = false ;
                 try {
-                    Thread.sleep(10000); // 10초 대기
+                    int i = 0;
+                    while (!threadOut){
+                        Thread.sleep(400); // 0.4초 대기
+                        i += 10;
+                        if (i == 1000)
+                            break ;
+                    }
                     isTimeout = true; // 타임아웃 설정
+                    System.out.println("타이머가 종료되었습니다.");
                 } catch (InterruptedException ignored) {}
             }
         });
@@ -62,6 +59,33 @@ public class db {
         timerThread.start();
     }
 
+    public static String inputProcessString(){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String input = null;
+        while (!isTimeout) {
+            try {
+                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
+                    input = reader.readLine();
+                    break;
+                }
+            } catch (IOException ignored) {}
+        }
+        return input;
+    }
+    public static int inputProcessInt(){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        int result = 1004;
+        while (!isTimeout) {
+            try {
+                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
+                    result = Integer.parseInt(reader.readLine());
+                    break;
+                }
+            } catch (IOException ignored) {}
+        }
+        return result;
+    }
     //txt파일에서 회원 아이디 찾는 메서드
     public static boolean searchIdOrPassword(String id,String pwd,boolean flag) throws IOException{
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -418,7 +442,7 @@ public class db {
         while(true){
             if (updateItem(choiceItem)){
                 System.out.println("해당 아이템은 사용할수 있는 개수가 없습니다. 아이템 숫자를 다시 적어주세요 아이템을 사용하기 싫다면 999을 적으세요");
-                choiceItem = AnyPang_Game.inputProcessInt();
+                choiceItem = inputProcessInt();
                 if (choiceItem == 1004)
                     return 1004;
                 System.out.println(choiceItem + "------------------------");

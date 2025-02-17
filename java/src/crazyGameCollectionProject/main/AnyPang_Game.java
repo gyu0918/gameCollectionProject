@@ -70,20 +70,21 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             copyArray(1);
             System.out.println("아이템 사용하겠습니까? yes or no");
 
-//            String input = in.nextLine().trim();
             String input = inputProcessString();
-            if (input == null)
-                break ;
+            if (input == null) {
+                threadOut = true;
+                break;
+            }
             if (input.equals("yes")) {
                 System.out.println("아이템 목록 : (1)"+"💣"+ "폭탄 "+"(2)"+"✝️"+"십자가 (3)"+"❤️" +"일심동체 ");
                 int gameItemnum = inputProcessInt();
-                if (gameItemnum == 1004)
-                    break ;
-                if (item(gameItemnum) == 1004)
-                    break ;
-//                in.nextLine(); //버퍼 지우기
+                if (gameItemnum == 1004) {
+                    break;
+                }
+                if (item(gameItemnum) == 1004) {
+                    break;
+                }
                 prtTool();
-
                 downZero();
                 fillZero();
                 checkDuplicate();
@@ -94,8 +95,9 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
 
             }
 
-            if (changeCoordintae() == 1004)  //좌표 바꾸기
-                break ;
+            if (changeCoordintae() == 1004) {  //좌표 바꾸기
+                break;
+            }
             checkDuplicate();
             downZero();
             fillZero();
@@ -103,46 +105,17 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
             copyArray(2);
 
             if (endGame() == 1) {
+                System.out.println("총점수는 : " + totalScore[0] + "입니다!!");
                     break;
-                }
+            }
           }
-        System.out.println("총점수는 : " + totalScore[0] + "입니다!!");
+          threadOut = true;
+
     }
 
 
     //------------------------------------------------------------------------------------------
-    public static String inputProcessString(){
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String input = null;
-        while (!isTimeout) {
-            try {
-                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
-                    input = reader.readLine();
-                    break;
-                }
-            } catch (IOException ignored) {}
-        }
-        System.out.println(input);
-        return input;
-    }
-    public static int inputProcessInt(){
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        int result = 1004;
-        while (!isTimeout) {
-            try {
-                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
-                    result = Integer.parseInt(reader.readLine());
-                    break;
-                }
-            } catch (IOException ignored) {}
-        }
-        return result;
-    }
-
-    public static void resetTotalScore(){
-
-    }
 
     public static void checkDuplicate() {
         boolean flag = true;
