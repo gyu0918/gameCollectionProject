@@ -1,4 +1,4 @@
-package crazyGameCollectionProject.main;
+package main;
 
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +18,6 @@ public class Five_In_A_Row_Game extends db {
     static String player2;
     public static void omogGame() throws IOException {
         boardspace();
-//        inputId();
         login(true);
         printBoard();
        //점수 초기화
@@ -36,12 +35,6 @@ public class Five_In_A_Row_Game extends db {
            changePlayer();
        }
 
-    }
-    public static void inputId(){
-        System.out.println("첫번째 플레이어의 ID를 입력하세요");
-        player1 = sc.nextLine();
-        System.out.println("두번째 플레이어의 ID를 입력하세요");
-        player2 = sc.nextLine();
     }
 
     public static void inputPlayer() {

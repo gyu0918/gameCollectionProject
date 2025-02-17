@@ -1,15 +1,20 @@
-package crazyGameCollectionProject.main;
+package main;
 
 
 import java.io.*;
 import java.util.*;
 
+import static main.CardMatchingGame.cardMatchingGame;
+import static main.ChessGame.chessGame;
+
 public class db {
     static Scanner in = new Scanner(System.in);
 
     static Random rand = new Random();
-//    static File file = new File("d:\\example\\writeFile.txt");   //window 용
-    static File file = new File("/Users/junggkim/Desktop/myfile.txt");   //mac용
+    static File file = new File("d:\\example\\writeFile.txt");   //window 용
+
+
+//    static File file = new File("/Users/junggkim/Desktop/myfile.txt");   //mac용
 
     static int[][] a = new int[7][7];
     static int[][] parentSecond = new int[a.length][a[0].length];
@@ -64,7 +69,7 @@ public class db {
         String input = null;
         while (!isTimeout) {
             try {
-                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
+                if (reader.ready()) {
                     input = reader.readLine();
                     break;
                 }
@@ -78,7 +83,7 @@ public class db {
         int result = 1004;
         while (!isTimeout) {
             try {
-                if (reader.ready()) { // 입력이 있는 경우 (엔터를 치는 경우 버퍼에 입력된다 하지만 엔터를 치지 않은 경우 ready는 false다
+                if (reader.ready()) {
                     result = Integer.parseInt(reader.readLine());
                     break;
                 }
@@ -141,7 +146,7 @@ public class db {
             Five_In_A_Row_Game.player1 = loginId;
         }
 
-        //텍스트 파일에 아이디,비밀번호,뿌요점수,오목점수,추가게임점수,코인개수,폭탄아이템개수,십자가아이템개수,선택숫자삭제아이템개수
+        //텍스트 파일에 아이디,비밀번호,애니펑점수,오목점수,체스게임점수,코인개수,폭탄아이템개수,십자가아이템개수,선택숫자삭제아이템개수
         //id 검색 + 회원가입부분
         if (searchIdOrPassword(name,null,true)) {
             System.out.println("아이디가 없네요 해당 아이디로 회원가입을 시작하겠습니다. 비번을 입력하세요.");
@@ -234,7 +239,7 @@ public class db {
             coinCnt -= quantity * numberOfCoins[itemNum - 1];
 
             //코인개수, 아이템 개수 메모장에 넣기
-            //텍스트 파일에 0아이디,1비밀번호,2뿌요점수,3오목점수,4추가게임점수,5코인개수,6폭탄아이템개수,7십자가아이템개수,8선택숫자삭제아이템개수
+            //텍스트 파일에 0아이디,1비밀번호,2애니펑점수,3오목점수,4추가게임점수,5코인개수,6폭탄아이템개수,7십자가아이템개수,8선택숫자삭제아이템개수
             // 파일의 내용을 다시 읽어와서 수정된 부분만 변경
             br.close(); // BufferedReader 종료
             br = new BufferedReader(new FileReader(file));
@@ -257,11 +262,10 @@ public class db {
                             .append(part[8]).append("\n");
                     isModified = true;
 
-                } else {  //이 부분이 없다면 새로 변경되고 나머지 아이디는 모두 지워진다.
+                } else {  //login이 아닌 아이디 정보들은 그대로 개행문자만 붙여주고 복사한다.
                     sb.append(str).append("\n");
                 }
             }
-
             br.close();
 
             if (isModified) {
@@ -323,7 +327,7 @@ public class db {
         bw.write(sb.toString());
         bw.close();
     }
-    public static void defindRanking(int rankingNum) throws IOException{
+    public static void defindRanking(int rankingNum) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         //트리맵에다가 원하는 값들을 넣는다.
@@ -341,10 +345,10 @@ public class db {
         br.close();
 
         int i = 1;
-        for (Map.Entry<Integer,Set<String>> entry : board.entrySet()){
-            System.out.println(i + " 등 = " + entry.getValue() + "  " +entry.getKey() +" 점");
+        for (Map.Entry<Integer, Set<String>> entry : board.entrySet()) {
+            System.out.println(i + " 등 = " + entry.getValue() + "  " + entry.getKey() + " 점");
             if (i++ == 10)
-                break ;
+                break;
         }
 
     }
@@ -372,28 +376,35 @@ public class db {
 
 
         System.out.println("실행하고 싶은 기능을 숫자로 고르세요");
-        System.out.println("1번 = 애니팡 게임 스타트 | 2번 = 오목 게임 스타트 | 3번 = 코인개수보기 | 4번 = 아이템개수확인 | 5번 = 아이템 구매 | 6번 = 랭킹보기 | 7번 = 전체종료");
+        System.out.println("1번 = 애니팡 게임 스타트 | 2번 = 오목 게임 스타트 | 3번 = 체스 게임 스타트 | 4번 = 카드 매칭 게임 스타트 " +
+                "| 5번 = 코인개수보기 | 6번 = 아이템개수확인 | 7번 = 아이템 구매 | 8번 = 랭킹보기 | 9번 = 전체종료");
         int menuNum = in.nextInt();
-        //예외처리 해두기
         if (menuNum == 1){
             return 1;
         }else if (menuNum == 2){
             in.nextLine();
             Five_In_A_Row_Game.omogGame();
-            //이부분은 점수 오목게임 로그인 방식 바꾸고 나서 들어가야될듯 위치가 여기가 아닐수도 있음
         }else if (menuNum == 3){
-            ptrCoin();
+            chessGame();
         }else if (menuNum == 4){
-            ptrItemCnt();
+            cardMatchingGame();
         }else if (menuNum == 5){
-            purchaseItem();
+            ptrCoin();
         }else if (menuNum == 6){
-            ptrRanking();
+            ptrItemCnt();
+
         }else if (menuNum == 7){
-            return 7;
+            purchaseItem();
+
+        }else if (menuNum == 8) {
+            ptrRanking();
+
+        }else if (menuNum == 9) {
+            return 9;
         }
         return 0;
     }
+
     public static boolean updateItem(int choiceItem) throws IOException{
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(new FileReader(file));

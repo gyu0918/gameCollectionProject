@@ -1,8 +1,6 @@
-package crazyGameCollectionProject.main;
+package main;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 
@@ -32,13 +30,12 @@ public  class AnyPang_Game extends Five_In_A_Row_Game {
                 }
                 openMenuflag = false;
             }
-            //menuNum 1번 : 게임스타트 2번 : 코인개수  3번 :  아이템개수 4번 : 랭킹시스템
             int trueflag = openMenu();
             if(trueflag== 1) {
                 threadGO();
                 gameStart();
                 updateScore(trueflag, loginId, false);
-            }else if (trueflag == 7) {
+            }else if (trueflag == 9) {
                 break;
             }
 
