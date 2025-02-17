@@ -1,4 +1,4 @@
-package main;
+package crazyGameCollectionProject.main;
 
 import java.util.Scanner;
 

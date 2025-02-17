@@ -1,11 +1,11 @@
-package main;
+package crazyGameCollectionProject.main;
 
 
 import java.io.*;
 import java.util.*;
 
-import static main.CardMatchingGame.cardMatchingGame;
-import static main.ChessGame.chessGame;
+import static  crazyGameCollectionProject.main.CardMatchingGame.cardMatchingGame;
+import static crazyGameCollectionProject.main.ChessGame.chessGame;
 
 public class db {
     static Scanner in = new Scanner(System.in);
